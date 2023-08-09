@@ -12,6 +12,7 @@ import numpy as np
 import torch
 
 from utils import TryExcept, threaded
+import pickle
 
 
 def fitness(x):
@@ -82,6 +83,11 @@ def ap_per_class(tp, conf, pred_cls, target_cls, plot=False, save_dir='.', names
     f1 = 2 * p * r / (p + r + eps)
     names = [v for k, v in names.items() if k in unique_classes]  # list: only classes that have data
     names = dict(enumerate(names))  # to dict
+
+    # aran added
+    with open('./p_r_pr_f1_painter/p_r_pr_f1_painter/kmeans_metric.pkl', 'wb') as f:
+        pickle.dump((px, py, p, r, f1, ap), f)
+
     if plot:
         plot_pr_curve(px, py, ap, Path(save_dir) / f'{prefix}PR_curve.png', names)
         plot_mc_curve(px, f1, Path(save_dir) / f'{prefix}F1_curve.png', names, ylabel='F1')
@@ -316,6 +322,10 @@ def wh_iou(wh1, wh2, eps=1e-7):
 
 @threaded
 def plot_pr_curve(px, py, ap, save_dir=Path('pr_curve.png'), names=()):
+    # aran added
+    data = (px, py, ap, names)
+    with open('./p_r_pr_f1_painter/p_r_pr_f1_painter/1evc_pr.pkl', 'wb') as f:
+        pickle.dump(data, f)
     # Precision-recall curve
     fig, ax = plt.subplots(1, 1, figsize=(9, 6), tight_layout=True)
     py = np.stack(py, axis=1)
